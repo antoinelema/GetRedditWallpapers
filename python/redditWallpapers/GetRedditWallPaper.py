@@ -17,32 +17,32 @@ def conection(url):
         'postman-token': "0802df05-b56d-a7b3-8c44-bee2a6e2a14e"
         }
 
-    return requests.request("GET", url, headers=headers)
+    return requests.request("GET", url, headers=headers, params=body)
 
 def soupolait(html_doc):
-    soup = BeautifulSoup(html_doc.text, 'html.parser') #enlever .text si en test
+    soup = BeautifulSoup(html_doc.text, 'html.parser')  # enlever .text si en test
     tabImg = soup.select(".thing")
     print (soup)
 
-    i=0
+    i = 0
     for a in tabImg[0].find_all('a', href=True):
 
-        dictUrl[i] = ( a['href'])
-        i+=1
+        dictUrl[i] = (a['href'])
+        i += 1
 
     print (dictUrl[0])
     return dictUrl[0]
 
 
-dictUrl={}
+dictUrl = {}
 url = "https://www.reddit.com/r/wallpapers/hot"
 
 
-urlImg=soupolait(conection(url))
+urlImg = soupolait(conection(url))
 
 
 # print (tabImg[0].find_all('a', href=True))
 
 
-urllib.request.urlretrieve(urlImg,"fond/fond.jpg") #enregistre le fond dans le dossier fond sous le nom fond. jpg
+urllib.request.urlretrieve(urlImg, "fond/fond.jpg")  #enregistre le fond dans le dossier fond sous le nom fond.jpg
 call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "'file:///home/antoine/Documents/Dev/python/redditWallpapers/fond/fond.jpg'"]) #change le fond d'ecran de l'ordi #gnome3
