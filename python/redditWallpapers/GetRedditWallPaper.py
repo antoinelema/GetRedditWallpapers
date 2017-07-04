@@ -1,12 +1,15 @@
-#from redditWallpaper import html as html_doc
+# from redditWallpaper import html as html_doc
 from ignorpasswd import passwd, modhash
+import refind
 import json
 import urllib
 import requests
 from bs4 import BeautifulSoup
 from subprocess import call
 
+
 def conection(url):
+    """Conection et Get du site."""
     body = {
         'username': "neiho",
         'passwd': passwd
@@ -19,10 +22,16 @@ def conection(url):
 
     return requests.request("GET", url, headers=headers, params=body)
 
+
 def soupolait(html_doc):
+    """
+    Transforme du html en str avec BeautifulSoup.
+    Trouve le lien de l'image recherché.
+    """
+    dictUrl = {}
     soup = BeautifulSoup(html_doc.text, 'html.parser')  # enlever .text si en test
-    tabImg = soup.select(".thing")
-    print (soup)
+    tabImg = soup.select(".thing")  # ne retient que les element de la class thing
+    # print (soup)
 
     i = 0
     for a in tabImg[0].find_all('a', href=True):
@@ -34,15 +43,32 @@ def soupolait(html_doc):
     return dictUrl[0]
 
 
-dictUrl = {}
+def step2(urlImg):
+    # trouver nature url et refaire un get
+    pass
+
+
+def checkUrlImg(urlImg):
+    ext1 = "jpg"
+    ext2 = "jpeg"
+    ext3 = "png"
+    ext4 = "bmp"  # extention d'image
+    urlImgMin = urlImg.lower()  # metre url en minuscule
+    if urlImgMin.rfind(ext1) > -1 or urlImgMin.rfind(ext2) > -1 or urlImgMin.rfind(ext3) > -1 or urlImgMin.rfind(ext4) > -1:
+        print()
+        return urlImg
+    else:
+        return step2(urlImg)
+
+
+def changefond(trueUrlImg):
+    urllib.request.urlretrieve(urlImg, "fond/fond.jpg")  # enregistre le fond dans le dossier fond sous le nom fond.jpg
+    call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "'file:///home/antoine/Documents/Dev/python/redditWallpapers/fond/fond.jpg'"])  # change le fond d'ecran de l'ordi #gnome3
+
+
 url = "https://www.reddit.com/r/wallpapers/hot"
-
-
 urlImg = soupolait(conection(url))
-
+trueUrlImg = checkUrlImg(urlImg)
+changefond(trueUrlImg)
 
 # print (tabImg[0].find_all('a', href=True))
-
-
-urllib.request.urlretrieve(urlImg, "fond/fond.jpg")  #enregistre le fond dans le dossier fond sous le nom fond.jpg
-call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "'file:///home/antoine/Documents/Dev/python/redditWallpapers/fond/fond.jpg'"]) #change le fond d'ecran de l'ordi #gnome3
