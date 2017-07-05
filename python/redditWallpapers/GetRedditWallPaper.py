@@ -1,26 +1,37 @@
 # from redditWallpaper import html as html_doc
-from ignorpasswd import passwd, modhash
-import refind
+from ignorpasswd import passwd, modhash, clientID,clientSecret
+
 import json
 import urllib
 import requests
+import requests.auth
 from bs4 import BeautifulSoup
 from subprocess import call
 
+def getToken():
+    client_auth = requests.auth.HTTPBasicAuth(clientID, clientSecret)
+    post_data = {
+        "grant_type": "password",
+        "username": "neiho",
+        "password": passwd
+        }
+    headers = {
+        "User-Agent": "neiho"
+        }
+
+    response = requests.post("https://www.reddit.com/api/v1/access_token", auth=client_auth, data=post_data, headers=headers)
+    json_data = response.json()
+    token = json_data['access_token']
+    return token
 
 def conection(url):
     """Conection et Get du site."""
-    body = {
-        'username': "neiho",
-        'passwd': passwd
-        }
+    querystring = {"access_token":getToken}
     headers = {
-        'x-modhash': modhash,
-        'cache-control': "no-cache",
-        'postman-token': "0802df05-b56d-a7b3-8c44-bee2a6e2a14e"
+        'x-modhash': modhash
         }
 
-    return requests.request("GET", url, headers=headers, params=body)
+    return requests.request("GET", url, headers=headers, params=querystring)
 
 
 def soupolait(html_doc):
@@ -55,7 +66,7 @@ def checkUrlImg(urlImg):
     ext4 = "bmp"  # extention d'image
     urlImgMin = urlImg.lower()  # metre url en minuscule
     if urlImgMin.rfind(ext1) > -1 or urlImgMin.rfind(ext2) > -1 or urlImgMin.rfind(ext3) > -1 or urlImgMin.rfind(ext4) > -1:
-        print()
+        print("image trouvé"")
         return urlImg
     else:
         return step2(urlImg)
