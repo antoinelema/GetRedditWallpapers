@@ -1,7 +1,9 @@
+#!/usr/bin/python3
 # from redditWallpaper import html as html_doc
 from ignorpasswd import passwd, modhash, clientID,clientSecret
 from datetime import datetime
 import json
+import os
 import sys
 import urllib
 import requests
@@ -24,7 +26,7 @@ def getToken():
     response = requests.post("https://www.reddit.com/api/v1/access_token", auth=client_auth, data=post_data, headers=headers)
     json_data = response.json()
     token = json_data['access_token']
-    print ("token : ",token)
+    # print ("token : ",token)
     return token
 
 def Get(url,token):
@@ -56,20 +58,23 @@ def soupolait(html_doc,recherche):
         dictUrl[i] = (a['href'])
         i += 1
 
-    print (dictUrl[0])
+    # print (dictUrl[0])
     return dictUrl[0]
 
 
 def step2(url,token):
-    if url.rfind("i.redd.it") > -1:
+    """ ouvre le lien trouvé qui n'était pas sune image, si le lien renvoi sur reddit => rechercher l'image """
+    print("nouvelle essai ...")
+    if url.rfind("/r/wallpapers") > -1:
         recherche = ".media-preview-content"
-        soupolait(Get(url,token),recherche)
+        return(soupolait(Get("https://www.reddit.com{}".format(url),token),recherche))
     else :
         print ("echec ... fermeture ... ")
         sys.exit()
 
 
 def checkUrlImg(urlImg,token):
+    """ verifie que l'url est une image, si non envoi en step2 """
     listext = ["jpg","jpeg","png","bmp"]
     # extention d'image
     urlImgMin = urlImg.lower()  # metre url en minuscule
@@ -81,13 +86,20 @@ def checkUrlImg(urlImg,token):
         print ("image non trouée ...")
         return step2(urlImg,token)
 
+def ext(url):
+    """ trouve et renvoi l'estention d'une url """
+    filename, file_extension = os.path.splitext(url)
+    return(file_extension)
 
 def changefond(trueUrlImg):
+    """ enregistre l'image et la met en fond """
     now=datetime.now()
+    extension=ext(trueUrlImg)
+    cheminImg = "/home/antoine/Documents/Dev/python/redditWallpapers/fond/fond.{}-{}-{}{}".format(now.day,now.month,now.year,extension)
     print("telechargement ...")
-    urllib.request.urlretrieve(urlImg, "fond/fond.{}-{}-{}.{}".format(now.day,now.month,now.year,ext))
-    # {}".format(urlImg))  # enregistre le fond dans le dossier fond sous le nom fond.jpg
-    call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "'file:///home/antoine/Documents/Dev/python/redditWallpapers/fond/fond.jpg'"])  # change le fond d'ecran de l'ordi #gnome3
+    urllib.request.urlretrieve(trueUrlImg, cheminImg)
+    call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "file://{}".format(cheminImg)])  # change le fond d'ecran de l'ordi #gnome3
+    # cherhcer une alternative a fille/// sui ne permet pas les lien
 
 token = getToken()
 recherche = ".thing"
