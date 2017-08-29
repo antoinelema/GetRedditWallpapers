@@ -10,3 +10,5 @@ python/redditWallpapers/GetRedditWallPaper\.py
 Test/
 
 python/redditWallpapers/fond/
+
+python/redditWallpapers/__pycache__/ignorpasswd\.cpython-35\.pyc

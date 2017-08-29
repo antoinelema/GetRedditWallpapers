@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # from redditWallpaper import html as html_doc
-from ignorpasswd import passwd, modhash, clientID,clientSecret
+from ignorpasswd import passwd, clientID,clientSecret
 from datetime import datetime
 import json
 import os
@@ -95,10 +95,11 @@ def changefond(trueUrlImg):
     """ enregistre l'image et la met en fond """
     now=datetime.now()
     extension=ext(trueUrlImg)
-    cheminImg = "/home/antoine/Documents/Dev/python/redditWallpapers/fond/fond.{}-{}-{}{}".format(now.day,now.month,now.year,extension)
+    cheminCourrant = os.getcwd()
+    cheminImg = "fond/fond.{}-{}-{}{}".format(now.day,now.month,now.year,extension)
     print("telechargement ...")
     urllib.request.urlretrieve(trueUrlImg, cheminImg)
-    call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "file://{}".format(cheminImg)])  # change le fond d'ecran de l'ordi #gnome3
+    call(["gsettings", "set", "org.gnome.desktop.background", "picture-uri", "file://{}".format(cheminCourrant + '/' + cheminImg)])  # change le fond d'ecran de l'ordi #gnome3
     # cherhcer une alternative a fille/// sui ne permet pas les lien
 
 token = getToken()
